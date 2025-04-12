@@ -1,0 +1,19 @@
+{
+  "name": "xxxxxx-plugin",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "packageManager": "pnpm@10.6.5",
+  "dependencies": {
+    "ansi-escapes": "^7.0.0",
+    "chokidar": "^4.0.3",
+    "yaml": "^2.7.1"
+  }
+}
