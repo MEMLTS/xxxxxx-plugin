@@ -7,8 +7,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "xxxxxx",
+    "yunzai",
+    "pixiv",
+    "ehentai",
+    "x",
+    "twitter",
+    "bot"
+  ],
+  "imports": {
+    "#components": "./components/index.js",
+    "#model": "./model/index.js"
+  },
+  "author": "MEMLTS",
   "license": "GPL-3.0-only",
   "packageManager": "pnpm@10.6.5",
   "dependencies": {
