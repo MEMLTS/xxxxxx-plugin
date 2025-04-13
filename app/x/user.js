@@ -1,11 +1,10 @@
-import { Request } from '#utils'
-import { Config } from '#components'
+import { getReq } from '../../model/x/index.js'
 
 export class XUser extends plugin {
   constructor () {
     super({
       name: '[xxxxxx-plugin]x-user',
-      dsc: '推特用户信息',
+      dsc: '推特用户相关接口',
       event: 'message',
       priority: 1,
       rule: [
@@ -22,8 +21,6 @@ export class XUser extends plugin {
     if (!match || !match[5]) return e.reply('用户名不能为空！！！', true)
     const userName = match[5].trim()
 
-    const config = await Config.getDefOrConfig('cookie')
-    const cookie = `auth_token=${config.x_auth_token};ct0=${config.x_ct0};`
     const url = `https://x.com/i/api/graphql/32pL5BWe9WKeSK1MoPvFQQ/UserByScreenName?variables=${encodeURIComponent(JSON.stringify({ screen_name: userName }))}&features=${encodeURIComponent(JSON.stringify({
       hidden_profile_subscriptions_enabled: true,
       profile_label_improvements_pcf_label_in_post_enabled: true,
@@ -41,18 +38,11 @@ export class XUser extends plugin {
     }))}&fieldToggles=${encodeURIComponent(JSON.stringify({ withAuxiliaryUserLabels: true }))}`
 
     try {
-      const data = await Request.request({
-        url,
-        cookie,
-        headers: {
-          authorization: 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
-          'x-csrf-token': config.x_ct0
-        }
-      })
+      const data = await getReq(url)
       e.reply(data.data, true)
     } catch (error) {
       logger.error('请求失败:', error.message)
-      e.reply('获取用户信息失败，请稍后重试！', true)
+      e.reply('获取用户信息失败，请检查控制台输出', true)
     }
   }
 }

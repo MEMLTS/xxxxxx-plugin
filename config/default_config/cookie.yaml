@@ -1,7 +1,7 @@
 # X auth_token
 x_auth_token:
 
-# X ct0 // 不需要自己获取
+# X ct0 一般不需要自己获取
 x_ct0:
 
 # Pixiv refresh token
