@@ -15,7 +15,7 @@ const defaultHeaders = {
 
 class Request {
   static createAgent (proxy) {
-    if (!proxy) return null
+    if (!proxy || !config.proxy) return null
 
     const proxyUrl = new URL(proxy)
     switch (proxyUrl.protocol) {
@@ -39,7 +39,7 @@ class Request {
     cookie,
     method = 'GET',
     timeout = 10000,
-    proxy = config.proxy,
+    proxy = config.proxyUrl,
     ...rest
   }) {
     const parsedUrl = new URL(url)
