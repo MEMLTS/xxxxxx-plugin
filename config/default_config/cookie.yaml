@@ -1,0 +1,20 @@
+# X auth_token
+x_auth_token:
+
+# X ct0 // 不需要自己获取
+x_ct0:
+
+# Pixiv refresh token
+pixiv_refresh_token:
+
+# JM Cookie
+jm_cookie:
+
+# Ehentai Cookie
+ehentai_cookie:
+
+# PronHub Cookie
+pronhub_cookie:
+
+# jinjiang Cookie
+jinjiang_cookie:
