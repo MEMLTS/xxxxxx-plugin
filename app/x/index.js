@@ -23,7 +23,8 @@ export class XUser extends plugin {
     const variables = {
       focalTweetId: id,
       referrer: 'search',
-      controller_data: 'DAACDAAFDAABDAABDAABCgABAAAAAAACAAAAAAwAAgoAAQAAAAAAAAAACgAC4BsF21Eg96ILAAMAAAAM6LWk5r2u5ri45oiPCgAFCSKCzM%2Bw%2F2IIAAYAAAASCgAHwPQqsmK9tqEAAAAAAA%3D%3D',
+      controller_data:
+        'DAACDAAFDAABDAABDAABCgABAAAAAAACAAAAAAwAAgoAAQAAAAAAAAAACgAC4BsF21Eg96ILAAMAAAAM6LWk5r2u5ri45oiPCgAFCSKCzM%2Bw%2F2IIAAYAAAASCgAHwPQqsmK9tqEAAAAAAA%3D%3D',
       with_rux_injections: false,
       rankingMode: 'Relevance',
       includePromotedContent: true,
@@ -75,51 +76,127 @@ export class XUser extends plugin {
       withDisallowedReplyControls: false
     }
 
-    const url = `https://x.com/i/api/graphql/b9Yw90FMr_zUb8DvA8r2ug/TweetDetail?variables=${encodeURIComponent(JSON.stringify(variables))}&features=${encodeURIComponent(JSON.stringify(features))}&fieldToggles=${encodeURIComponent(JSON.stringify(fieldToggles))}`
+    const url = `https://x.com/i/api/graphql/b9Yw90FMr_zUb8DvA8r2ug/TweetDetail?variables=${encodeURIComponent(
+      JSON.stringify(variables)
+    )}&features=${encodeURIComponent(
+      JSON.stringify(features)
+    )}&fieldToggles=${encodeURIComponent(JSON.stringify(fieldToggles))}`
+
     try {
-      const data = await getReq(url)
-      const jsonData = JSON.parse(data.data)
+      const response = await getReq(url)
+      const data = JSON.parse(response.data)
+      const parsedData = this.parseTweetData(data)
 
-      const mainContent = this.extractMainContent(jsonData)
+      if (!parsedData) return e.reply('未找到推文信息', true)
 
-      e.reply(mainContent, true)
+      const formattedContent = this.formatTweetResult(parsedData)
+      e.reply(formattedContent, true)
     } catch (error) {
+      if (error.status === 404) {
+        return e.reply('推文不存在或已删除', true)
+      }
       logger.error('请求失败:', error.message)
-      e.reply('获取推特信息失败，请检查控制台输出', true)
+      e.reply('获取推文信息失败，请检查ID是否正确', true)
     }
   }
 
-  extractMainContent (data) {
-    const mainContent = []
+  // ID格式验证
+  sanitizeId (idStr) {
+    return idStr.replace(/[^0-9]/g, '')
+  }
 
-    // 遍历 entries 提取关键信息
-    const entries = data.data.threaded_conversation_with_injections_v2.instructions[0].entries
-    for (const entry of entries) {
-      if (entry.content.entryType === 'TimelineTimelineItem' && entry.content.itemContent.itemType === 'TimelineTweet') {
-        const tweet = entry.content.itemContent.tweet_results.result
-
-        const tweetInfo = {
-          tweetId: tweet.rest_id,
-          userId: tweet.core.user_results.result.rest_id,
-          userName: tweet.core.user_results.result.legacy.name,
-          userScreenName: tweet.core.user_results.result.legacy.screen_name,
-          createdAt: tweet.legacy.created_at,
-          fullText: tweet.legacy.full_text,
-          retweetCount: tweet.legacy.retweet_count,
-          favoriteCount: tweet.legacy.favorite_count,
-          replyCount: tweet.legacy.reply_count,
-          quoteCount: tweet.legacy.quote_count,
-          viewCount: tweet.views.count,
-          media: tweet.legacy.extended_entities?.media?.map((media) => ({
-            mediaUrl: media.media_url_https,
-            mediaType: media.type
-          }))
-        }
-
-        mainContent.push(tweetInfo)
+  // 媒体类型判断
+  classifyMedia (media) {
+    if (media.type === 'video') {
+      const videoInfo = media.video_info
+      const highestQuality = videoInfo.variants.reduce((prev, curr) => {
+        return (curr.bitrate || 0) > (prev.bitrate || 0) ? curr : prev
+      })
+      return {
+        type: 'video',
+        url: highestQuality.url || videoInfo.variants[0].url,
+        duration: videoInfo.duration_millis,
+        resolution: `${videoInfo.aspect_ratio[0]}x${videoInfo.aspect_ratio[1]}`
+      }
+    } else {
+      return {
+        type: 'image',
+        url: media.media_url_https,
+        dimensions: media.sizes?.large || {}
       }
     }
+  }
 
-    return mainContent
+  parseTweetData (data) {
+    const entries = data?.data?.threaded_conversation_with_injections_v2?.instructions?.flatMap(
+      (inst) => inst.entries || []
+    ) || []
+
+    for (const entry of entries) {
+      if (
+        entry?.content?.entryType === 'TimelineTimelineItem' &&
+        entry?.content?.itemContent?.itemType === 'TimelineTweet'
+      ) {
+        const tweet = entry.content.itemContent.tweet_results.result
+        const legacy = tweet?.legacy || {}
+
+        return {
+          tweetId: tweet?.rest_id || '未知',
+          userId: tweet?.core?.user_results?.result?.rest_id || '未知',
+          userName: tweet?.core?.user_results?.result?.legacy?.name || '未知',
+          userScreenName: tweet?.core?.user_results?.result?.legacy?.screen_name || '未知',
+          createdAt: legacy.created_at,
+          fullText: legacy.full_text || legacy.text || '',
+          retweetCount: legacy.retweet_count || 0,
+          favoriteCount: legacy.favorite_count || 0,
+          replyCount: legacy.reply_count || 0,
+          quoteCount: legacy.quote_count || 0,
+          viewCount: tweet?.views?.count || 'N/A',
+          media: (legacy?.extended_entities?.media || []).map((m) =>
+            this.classifyMedia(m)
+          )
+        }
+      }
+    }
+    return null
+  }
+
+  formatTweetResult (data) {
+    const mediaList = data.media.map((m) => {
+      if (m.type === 'video') {
+        return `• 视频: ${m.url} (${m.resolution}, ${Math.round(m.duration / 1000)}秒)`
+      } else {
+        return `• 图片: ${m.url} (${m.dimensions?.w}x${m.dimensions?.h})`
+      }
+    })
+
+    return `🐦 推文解析结果：
+ID: ${data.tweetId}
+用户: ${data.userName} (@${data.userScreenName})
+发布时间: ${this.formatDate(data.createdAt)}
+👁 查看数: ${data.viewCount}
+🔁 转推: ${data.retweetCount}
+❤️ 喜欢: ${data.favoriteCount}
+💬 评论: ${data.replyCount}
+🔗 引用: ${data.quoteCount}
+
+📝 内容:
+${data.fullText || '无文本内容'}
+
+📸 媒体:
+${mediaList.length ? mediaList.join('\n') : '无媒体'}
+`
+  }
+
+  // 时间格式化
+  formatDate (dateStr) {
+    const date = new Date(dateStr)
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 }
