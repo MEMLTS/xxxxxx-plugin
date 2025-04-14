@@ -1,7 +1,6 @@
 export default [
   {
     label: 'Cookie配置',
-    // 第一个分组标记开始，无需标记结束
     component: 'SOFT_GROUP_BEGIN'
   },
   {

@@ -1,24 +1,28 @@
 import lodash from 'lodash'
 import config from './config.js'
 import cookie from './cookie.js'
+import x from './x.js'
 import { Config } from '#components'
 
 export const schemas = [
   config,
-  cookie
+  cookie,
+  x
 ].flat()
 
 export function getConfigData () {
   return {
     config: Config.getDefOrConfig('config'),
-    cookie: Config.getDefOrConfig('cookie')
+    cookie: Config.getDefOrConfig('cookie'),
+    x: Config.getDefOrConfig('x')
   }
 }
 
 export async function setConfigData (data, { Result }) {
   const configFiles = new Map([
     ['config', Config.getDefOrConfig('config')],
-    ['cookie', Config.getDefOrConfig('cookie')]
+    ['cookie', Config.getDefOrConfig('cookie')],
+    ['x', Config.getDefOrConfig('x')]
   ])
 
   for (const [key, value] of Object.entries(data)) {

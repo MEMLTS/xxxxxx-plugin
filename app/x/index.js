@@ -1,6 +1,7 @@
 import { getReq } from '../../model/x/index.js'
 import { Config } from '#components'
 import { addTrailingSlash } from '#utils'
+
 export class XDetails extends plugin {
   constructor () {
     super({
@@ -41,6 +42,11 @@ export class XDetails extends plugin {
 
   // 获取推文详情
   async getTweetDetails (tweetId, e) {
+    const x = await Config.getDefOrConfig('x')
+    if (!x.enable) {
+      logger.warn('[xxxxxx] X解析未启用！')
+      return false
+    }
     await e.reply('检测到X链接，正在解析中...')
     const config = await Config.getDefOrConfig('cookie')
     let commonUrl
