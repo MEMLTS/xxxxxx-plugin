@@ -19,12 +19,13 @@ export class XUser extends plugin {
   async xUser (e) {
     const match = e.msg.match(/^#?(x|推特|twitter)(解析)(推文|文章)(.+)?$/i)
     if (!match || !match[4]) return e.reply('不能为空！！！', true)
+
     const id = match[4].trim()
+
     const variables = {
       focalTweetId: id,
       referrer: 'search',
-      controller_data:
-        'DAACDAAFDAABDAABDAABCgABAAAAAAACAAAAAAwAAgoAAQAAAAAAAAAACgAC4BsF21Eg96ILAAMAAAAM6LWk5r2u5ri45oiPCgAFCSKCzM%2Bw%2F2IIAAYAAAASCgAHwPQqsmK9tqEAAAAAAA%3D%3D',
+      controller_data: 'DAACDAAFDAABDAABDAABCgABAAAAAAACAAAAAAwAAgoAAQAAAAAAAAAACgAC4BsF21Eg96ILAAMAAAAM6LWk5r2u5ri45oiPCgAFCSKCzM%2Bw%2F2IIAAYAAAASCgAHwPQqsmK9tqEAAAAAAA%3D%3D',
       with_rux_injections: false,
       rankingMode: 'Relevance',
       includePromotedContent: true,
@@ -85,107 +86,88 @@ export class XUser extends plugin {
     try {
       const response = await getReq(url)
       const data = JSON.parse(response.data)
-      const parsedData = this.parseTweetData(data)
 
-      if (!parsedData) return e.reply('未找到推文信息', true)
+      const entries = data?.data?.threaded_conversation_with_injections_v2?.instructions?.flatMap(
+        (inst) => inst.entries || []
+      ) || []
 
-      const formattedContent = this.formatTweetResult(parsedData)
-      e.reply(formattedContent, true)
+      for (const entry of entries) {
+        if (
+          entry?.content?.entryType === 'TimelineTimelineItem' &&
+          entry?.content?.itemContent?.itemType === 'TimelineTweet'
+        ) {
+          const tweet = entry.content.itemContent.tweet_results.result
+          const legacy = tweet?.legacy || {}
+
+          const tweetId = tweet?.rest_id || '未知'
+          // const userId = tweet?.core?.user_results?.result?.rest_id || '未知'
+          const userName = tweet?.core?.user_results?.result?.legacy?.name || '未知'
+          const userScreenName = tweet?.core?.user_results?.result?.legacy?.screen_name || '未知'
+          const createdAt = legacy.created_at
+          const fullText = legacy.full_text || legacy.text || ''
+          const retweetCount = legacy.retweet_count || 0
+          const favoriteCount = legacy.favorite_count || 0
+          const replyCount = legacy.reply_count || 0
+          const quoteCount = legacy.quote_count || 0
+          const viewCount = tweet?.views?.count || 'N/A'
+
+          const mediaList = (legacy?.extended_entities?.media || []).map((m, index) => {
+            try {
+              if (m.type === 'video' || m.type === 'animated_gif') {
+                // 选择最高质量视频流
+                const variants = m.video_info?.variants
+                  ?.filter(v => v.bitrate && v.content_type === 'video/mp4')
+                  ?.sort((a, b) => b.bitrate - a.bitrate) || []
+
+                if (variants.length > 0) {
+                  return segment.video(variants[0].url)
+                }
+                return segment.text('[视频暂不支持]')
+              }
+
+              if (m.type === 'photo') {
+                const sizes = m.sizes?.large || m.sizes?.medium || m.sizes?.small
+                const url = sizes ? `${m.media_url_https}?format=jpg&name=large` : m.media_url_https
+                return segment.image(url)
+              }
+
+              return segment.text(`[未知媒体类型: ${m.type}]`)
+            } catch (err) {
+              logger.error(`媒体处理错误[${index}]:`, err)
+              return segment.text('[媒体解析失败]')
+            }
+          }) || [segment.text('无媒体')]
+
+          const formattedContent = [
+  `🐦 推文解析结果
+ID: ${tweetId}
+用户: ${userName} (@${userScreenName})
+发布时间: ${this.formatDate(createdAt)}
+👁 查看数: ${viewCount}
+🔁 转推: ${retweetCount}
+❤️ 喜欢: ${favoriteCount}
+💬 评论: ${replyCount}
+🔗 引用: ${quoteCount}
+
+📝 内容
+${fullText || '无文本内容'}
+
+📸 媒体正在发送......`,
+  ...mediaList
+          ]
+
+          return e.reply(formattedContent, true)
+        }
+      }
+
+      return e.reply('未找到推文信息', true)
     } catch (error) {
       if (error.status === 404) {
         return e.reply('推文不存在或已删除', true)
       }
       logger.error('请求失败:', error.message)
-      e.reply('获取推文信息失败，请检查ID是否正确', true)
+      return e.reply('获取推文信息失败，请检查ID是否正确', true)
     }
-  }
-
-  // ID格式验证
-  sanitizeId (idStr) {
-    return idStr.replace(/[^0-9]/g, '')
-  }
-
-  // 媒体类型判断
-  classifyMedia (media) {
-    if (media.type === 'video') {
-      const videoInfo = media.video_info
-      const highestQuality = videoInfo.variants.reduce((prev, curr) => {
-        return (curr.bitrate || 0) > (prev.bitrate || 0) ? curr : prev
-      })
-      return {
-        type: 'video',
-        url: highestQuality.url || videoInfo.variants[0].url,
-        duration: videoInfo.duration_millis,
-        resolution: `${videoInfo.aspect_ratio[0]}x${videoInfo.aspect_ratio[1]}`
-      }
-    } else {
-      return {
-        type: 'image',
-        url: media.media_url_https,
-        dimensions: media.sizes?.large || {}
-      }
-    }
-  }
-
-  parseTweetData (data) {
-    const entries = data?.data?.threaded_conversation_with_injections_v2?.instructions?.flatMap(
-      (inst) => inst.entries || []
-    ) || []
-
-    for (const entry of entries) {
-      if (
-        entry?.content?.entryType === 'TimelineTimelineItem' &&
-        entry?.content?.itemContent?.itemType === 'TimelineTweet'
-      ) {
-        const tweet = entry.content.itemContent.tweet_results.result
-        const legacy = tweet?.legacy || {}
-
-        return {
-          tweetId: tweet?.rest_id || '未知',
-          userId: tweet?.core?.user_results?.result?.rest_id || '未知',
-          userName: tweet?.core?.user_results?.result?.legacy?.name || '未知',
-          userScreenName: tweet?.core?.user_results?.result?.legacy?.screen_name || '未知',
-          createdAt: legacy.created_at,
-          fullText: legacy.full_text || legacy.text || '',
-          retweetCount: legacy.retweet_count || 0,
-          favoriteCount: legacy.favorite_count || 0,
-          replyCount: legacy.reply_count || 0,
-          quoteCount: legacy.quote_count || 0,
-          viewCount: tweet?.views?.count || 'N/A',
-          media: (legacy?.extended_entities?.media || []).map((m) =>
-            this.classifyMedia(m)
-          )
-        }
-      }
-    }
-    return null
-  }
-
-  formatTweetResult (data) {
-    const mediaList = data.media.map((m) => {
-      if (m.type === 'video') {
-        return `• 视频: ${m.url} (${m.resolution}, ${Math.round(m.duration / 1000)}秒)`
-      } else {
-        return `• 图片: ${m.url} (${m.dimensions?.w}x${m.dimensions?.h})`
-      }
-    })
-
-    return `🐦 推文解析结果：
-ID: ${data.tweetId}
-用户: ${data.userName} (@${data.userScreenName})
-发布时间: ${this.formatDate(data.createdAt)}
-👁 查看数: ${data.viewCount}
-🔁 转推: ${data.retweetCount}
-❤️ 喜欢: ${data.favoriteCount}
-💬 评论: ${data.replyCount}
-🔗 引用: ${data.quoteCount}
-
-📝 内容:
-${data.fullText || '无文本内容'}
-
-📸 媒体:
-${mediaList.length ? mediaList.join('\n') : '无媒体'}
-`
   }
 
   // 时间格式化
