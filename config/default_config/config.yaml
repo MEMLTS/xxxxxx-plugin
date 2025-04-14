@@ -1,3 +1,7 @@
 # Proxy settings
 proxy: false
 proxyUrl:
+
+# 通用反代
+common: false
+commonUrl:

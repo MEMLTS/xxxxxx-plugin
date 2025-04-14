@@ -1,5 +1,6 @@
 import { getReq } from '../../model/x/index.js'
-
+import { Config } from '#components'
+import { addTrailingSlash } from '#utils'
 export class XDetails extends plugin {
   constructor () {
     super({
@@ -13,7 +14,7 @@ export class XDetails extends plugin {
           fnc: 'XDetail'
         },
         {
-          reg: /(?:https?:\/\/)?x\.com\/([^\/]+)\/status\/(\d+)/i,
+          reg: /(?:https?:\/\/)?x\.com\/([^/]+)\/status\/(\d+)/i,
           fnc: 'XDetailFromUrl'
         }
       ]
@@ -21,7 +22,7 @@ export class XDetails extends plugin {
   }
 
   async XDetailFromUrl (e) {
-    const match = e.msg.match(/(?:https?:\/\/)?x\.com\/([^\/]+)\/status\/(\d+)/i)
+    const match = e.msg.match(/(?:https?:\/\/)?x\.com\/([^/]+)\/status\/(\d+)/i)
     if (!match || !match[2]) return e.reply('链接格式错误！', true)
 
     const tweetId = match[2].trim()
@@ -41,6 +42,11 @@ export class XDetails extends plugin {
   // 获取推文详情
   async getTweetDetails (tweetId, e) {
     await e.reply('检测到X链接，正在解析中...')
+    const config = await Config.getDefOrConfig('cookie')
+    let commonUrl
+    if (config.common && config.commonUrl) {
+      commonUrl = addTrailingSlash(config.commonUrl)
+    }
     const variables = {
       focalTweetId: tweetId,
       referrer: 'search',
@@ -137,7 +143,7 @@ export class XDetails extends plugin {
                   ?.sort((a, b) => b.bitrate - a.bitrate) || []
 
                 if (variants.length > 0) {
-                  return segment.video(variants[0].url)
+                  return segment.video(config.common ? [commonUrl + variants[0].url] : variants[0].url)
                 }
                 return segment.text('[视频暂不支持]')
               }
@@ -145,7 +151,7 @@ export class XDetails extends plugin {
               if (m.type === 'photo') {
                 const sizes = m.sizes?.large || m.sizes?.medium || m.sizes?.small
                 const url = sizes ? `${m.media_url_https}?format=jpg&name=large` : m.media_url_https
-                return segment.image(url)
+                return segment.image(config.common ? [commonUrl + url] : url)
               }
 
               return segment.text(`[未知媒体类型: ${m.type}]`)
