@@ -38,12 +38,6 @@ export default [
     component: 'InputPassword'
   },
   {
-    field: 'cookie.pronhub_cookie',
-    label: 'PronHub',
-    bottomHelpMessage: 'PronHub Cookie',
-    component: 'InputPassword'
-  },
-  {
     field: 'cookie.jinjiang_cookie',
     label: '晋江文学城',
     bottomHelpMessage: '晋江文学城 Cookie',
