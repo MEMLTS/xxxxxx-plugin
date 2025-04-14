@@ -1,6 +1,6 @@
 import { getReq } from '../../model/x/index.js'
 
-export class XUser extends plugin {
+export class XDetails extends plugin {
   constructor () {
     super({
       name: '[xxxxxx-plugin]x-user',
@@ -10,20 +10,39 @@ export class XUser extends plugin {
       rule: [
         {
           reg: /^#?(x|推特|twitter)(解析)(推文|文章)(.+)?$/i,
-          fnc: 'xUser'
+          fnc: 'XDetail'
+        },
+        {
+          reg: /(?:https?:\/\/)?x\.com\/([^\/]+)\/status\/(\d+)/i,
+          fnc: 'XDetailFromUrl'
         }
       ]
     })
   }
 
-  async xUser (e) {
+  async XDetailFromUrl (e) {
+    const match = e.msg.match(/(?:https?:\/\/)?x\.com\/([^\/]+)\/status\/(\d+)/i)
+    if (!match || !match[2]) return e.reply('链接格式错误！', true)
+
+    const tweetId = match[2].trim()
+
+    return this.getTweetDetails(tweetId, e)
+  }
+
+  async XDetail (e) {
     const match = e.msg.match(/^#?(x|推特|twitter)(解析)(推文|文章)(.+)?$/i)
     if (!match || !match[4]) return e.reply('不能为空！！！', true)
 
-    const id = match[4].trim()
+    const tweetId = match[4].trim()
 
+    return this.getTweetDetails(tweetId, e)
+  }
+
+  // 获取推文详情
+  async getTweetDetails (tweetId, e) {
+    await e.reply('检测到X链接，正在解析中...')
     const variables = {
-      focalTweetId: id,
+      focalTweetId: tweetId,
       referrer: 'search',
       controller_data: 'DAACDAAFDAABDAABDAABCgABAAAAAAACAAAAAAwAAgoAAQAAAAAAAAAACgAC4BsF21Eg96ILAAMAAAAM6LWk5r2u5ri45oiPCgAFCSKCzM%2Bw%2F2IIAAYAAAASCgAHwPQqsmK9tqEAAAAAAA%3D%3D',
       with_rux_injections: false,
@@ -100,7 +119,6 @@ export class XUser extends plugin {
           const legacy = tweet?.legacy || {}
 
           const tweetId = tweet?.rest_id || '未知'
-          // const userId = tweet?.core?.user_results?.result?.rest_id || '未知'
           const userName = tweet?.core?.user_results?.result?.legacy?.name || '未知'
           const userScreenName = tweet?.core?.user_results?.result?.legacy?.screen_name || '未知'
           const createdAt = legacy.created_at
@@ -114,7 +132,6 @@ export class XUser extends plugin {
           const mediaList = (legacy?.extended_entities?.media || []).map((m, index) => {
             try {
               if (m.type === 'video' || m.type === 'animated_gif') {
-                // 选择最高质量视频流
                 const variants = m.video_info?.variants
                   ?.filter(v => v.bitrate && v.content_type === 'video/mp4')
                   ?.sort((a, b) => b.bitrate - a.bitrate) || []
@@ -139,7 +156,7 @@ export class XUser extends plugin {
           }) || [segment.text('无媒体')]
 
           const formattedContent = [
-  `🐦 推文解析结果
+            `🐦 推文解析结果
 ID: ${tweetId}
 用户: ${userName} (@${userScreenName})
 发布时间: ${this.formatDate(createdAt)}
@@ -150,10 +167,8 @@ ID: ${tweetId}
 🔗 引用: ${quoteCount}
 
 📝 内容
-${fullText || '无文本内容'}
-
-📸 媒体正在发送......`,
-  ...mediaList
+${fullText || '无文本内容'}`,
+            ...mediaList
           ]
 
           return e.reply(formattedContent, true)
