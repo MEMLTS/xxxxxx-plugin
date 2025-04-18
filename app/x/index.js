@@ -1,4 +1,4 @@
-import { getReq } from '../../model/x/index.js'
+import { getReq } from './request.js'
 import { addTrailingSlash } from '#utils'
 
 export class XDetails extends plugin {
@@ -42,8 +42,7 @@ export class XDetails extends plugin {
   // 获取推文详情
   async getTweetDetails (tweetId, e) {
     if (!global.xxxxxx.x.enable) {
-      logger.warn('[xxxxxx] X解析未启用！')
-      return false
+      return logger.warn('[xxxxxx] X解析未启用！')
     }
     await e.reply('检测到X链接，正在解析中...')
     let commonUrl

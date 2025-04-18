@@ -1,4 +1,4 @@
-import { getReq } from '../../model/x/index.js'
+import { getReq } from './request.js'
 
 export class XUser extends plugin {
   constructor () {

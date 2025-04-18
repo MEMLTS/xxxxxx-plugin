@@ -1,8 +1,12 @@
 import Request from './request.js'
 
-import { addTrailingSlash } from './tools.js'
+import {
+  addTrailingSlash,
+  getCookieValue
+} from './tools.js'
 
 export {
   Request,
-  addTrailingSlash
+  addTrailingSlash,
+  getCookieValue
 }
