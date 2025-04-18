@@ -4,7 +4,7 @@ export default [
     component: 'SOFT_GROUP_BEGIN'
   },
   {
-    field: 'config.enable',
+    field: 'x.enable',
     label: 'X解析',
     bottomHelpMessage: '是否启用X解析',
     component: 'Switch'
