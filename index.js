@@ -50,9 +50,9 @@ const loadPlugins = async () => {
 
     const elapsed = Date.now() - start
     logger.info('「---------- xxxxxx-plugin ------------」')
-    logger.info(`#   \x1b[16m🍀 成功加载 ${success} 个插件`)
-    logger.info(`#   \x1b[86m💥 失败加载 ${failure} 个插件`)
-    logger.info(`#   \x1b[36m⏳ 启动耗时: ${elapsed}ms\x1b[0m`)
+    logger.info(`|   \x1b[16m🍀 成功加载 ${success} 个插件`)
+    logger.info(`|   \x1b[86m💥 失败加载 ${failure} 个插件`)
+    logger.info(`|   \x1b[36m⏳ 启动耗时: ${elapsed}ms\x1b[0m`)
     logger.info('「---------- xxxxxx-plugin ------------」')
     return apps
   } catch (error) {

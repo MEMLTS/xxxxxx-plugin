@@ -175,7 +175,7 @@ ID: ${tweetId}
 🔗 引用: ${quoteCount}
 
 📝 内容
-${fullText || '无文本内容'}`,
+${fullText || ''}`,
             ...mediaList
           ]
 
