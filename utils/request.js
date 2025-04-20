@@ -13,7 +13,17 @@ const defaultHeaders = {
   'Accept-Language': 'en-US,en;q=0.9'
 }
 
+/**
+ * HTTP请求工具类，封装了常用的HTTP请求方法
+ * 支持代理设置、超时控制、请求头自定义等功能
+ */
 class Request {
+  /**
+   * 根据代理URL创建对应的代理Agent
+   * @param {string} proxy - 代理URL，支持http/https/socks协议
+   * @returns {HttpsProxyAgent|SocksProxyAgent|null} 返回对应的代理Agent，无代理时返回null
+   * @throws {Error} 当代理协议不支持时抛出异常
+   */
   static createAgent (proxy) {
     if (!proxy || !config.proxy) return null
 
@@ -32,6 +42,20 @@ class Request {
     }
   }
 
+  /**
+   * 发送HTTP请求
+   * @param {Object} options - 请求配置
+   * @param {string} options.url - 请求URL
+   * @param {Object} [options.headers={}] - 自定义请求头
+   * @param {Object} [options.data] - 请求体数据(POST/PUT/PATCH时使用)
+   * @param {string} [options.cookie] - Cookie字符串
+   * @param {string} [options.method='GET'] - HTTP方法(GET/POST/PUT等)
+   * @param {number} [options.timeout=10000] - 超时时间(毫秒)
+   * @param {string} [options.proxy=config.proxyUrl] - 代理URL
+   * @param {Object} [rest] - 其他HTTP请求选项
+   * @returns {Promise<Object>} 返回包含响应状态码、头部和数据的对象
+   * @throws {Error} 当请求失败或超时时抛出异常
+   */
   static async request ({
     url,
     headers = {},

@@ -1,7 +1,7 @@
 import { getReq } from './request.js'
 import { addTrailingSlash } from '#utils'
 
-export class XDetails extends plugin {
+export class X extends plugin {
   constructor () {
     super({
       name: '[xxxxxx-plugin]x-user',
