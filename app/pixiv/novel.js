@@ -1,10 +1,10 @@
-import { Request, addTrailingSlash } from '#utils'
+import { Request } from '#utils'
 
-export class Pixiv extends plugin {
+export class PixivNovel extends plugin {
   constructor () {
     super({
-      name: '[xxxxxx-plugin]Pixiv解析',
-      dsc: 'Pixiv解析',
+      name: '[xxxxxx-plugin]Pixiv解析-novel',
+      dsc: 'Pixiv解析-小说',
       event: 'message',
       priority: 1,
       rule: [
@@ -17,6 +17,7 @@ export class Pixiv extends plugin {
   }
 
   async novel (e) {
+    e.reply('Pixiv正在解析中...', true)
     let id
     const urlMatch = e.msg.match(
       /(?:https?:\/\/)?www\.pixiv\.net\/novel\/show\.php\?id=(\d+)/
@@ -29,10 +30,6 @@ export class Pixiv extends plugin {
     if (pixivMatch) {
       id = pixivMatch[2]
     }
-    let commonUrl
-    if (global.xxxxxx.config.common && global.xxxxxx.config.commonUrl) {
-      commonUrl = addTrailingSlash(global.xxxxxx.config.commonUrl)
-    }
     let url = `https://www.pixiv.net/ajax/novel/${id}?lang=zh`
     const response = await Request.request({
       url,
@@ -40,17 +37,24 @@ export class Pixiv extends plugin {
     })
 
     const novelData = JSON.parse(response.data).body
+    const novelDetail = novelData.content.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '')
+
     const common = { user_id: e.user_id || 451345424, nickname: e.nickname || '克鲁青山外' }
     const msg = [
       { message: `📖 标题: ${novelData.title}\n👤 作者: ${novelData.userName}` },
       { message: `❤️ 收藏数: ${novelData.bookmarkCount}\n👍 点赞数: ${novelData.likeCount}\n👀 阅读数: ${novelData.viewCount}` },
       { message: `🕒 创建时间: ${novelData.createDate}\n🔄 更新时间: ${novelData.uploadDate}` },
       {
-        message: `📝 内容:\n${novelData.content
-          .replace(/<br\s*\/?>/g, '\n')
-          .replace(/<[^>]+>/g, '')}`
+        message: `📝 内容:\n${novelDetail}`
       },
-      { message: ['🖼️ 封面:', segment.image(global.xxxxxx.config.common ? [commonUrl + novelData.coverUrl] : novelData.coverUrl)] },
+      {
+        message: ['🖼️ 封面:', segment.image(`base64://${Buffer.from((await Request.request({
+          url: novelData.coverUrl,
+          headers: {
+            Referer: 'https://i.pximg.net'
+          }
+        })).data).toString('base64')}`)]
+      },
       {
         message: `🏷️ 标签: ${novelData.tags.tags
           .map((tag) => tag.tag)
