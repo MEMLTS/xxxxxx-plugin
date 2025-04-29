@@ -5,8 +5,11 @@ import {
   getCookieValue
 } from './tools.js'
 
+import translation from './translation/index.js'
+
 export {
   Request,
   addTrailingSlash,
-  getCookieValue
+  getCookieValue,
+  translation
 }

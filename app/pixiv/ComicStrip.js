@@ -45,7 +45,6 @@ export class PixivComicStrip extends plugin {
 
     let res = await getReq(`https://www.pixiv.net/ajax/illust/${id}/pages?lang=zh`)
     let data = JSON.parse(res.data)
-    logger.info(JSON.stringify(data))
     if (data.error) {
       return e.reply('Pixiv解析失败: ' + data.message, true)
     }

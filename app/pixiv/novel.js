@@ -1,5 +1,5 @@
 import { getReq } from './request.js'
-import { Request } from '#utils'
+import { Request, translation } from '#utils'
 
 export class PixivNovel extends plugin {
   constructor () {
@@ -62,6 +62,19 @@ export class PixivNovel extends plugin {
           .join(', ')}`
       }
     ].map(item => ({ ...common, ...item }))
+    if (global.xxxxxx.pixiv.enableTranslation) {
+      const translatedNovelDetail = await translation.translateQQText(novelDetail)
+      if (translatedNovelDetail.message != 'Too many characters (over 6000) in block') {
+        msg.push({
+          message: `📝 翻译:\n${translatedNovelDetail.auto_translation[0]}`
+        })
+      } else {
+        msg.push({
+          message: '📝 翻译:\n文本过长,翻译失败！'
+        })
+      }
+    }
+
     return e.reply(await Bot.makeForwardMsg(msg))
   }
 }
