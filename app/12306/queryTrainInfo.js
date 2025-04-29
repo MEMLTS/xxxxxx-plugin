@@ -59,17 +59,19 @@ export class QueryTrainInfo extends plugin {
       if (!parsedData.data || !Array.isArray(parsedData.data.data)) {
         return e.reply('获取列车站点信息失败，请稍后重试。')
       }
-      const totalTime = parsedData.data.data[parsedData.data.data.length - 1].running_time;
-      const [hours, minutes] = totalTime.split(':').map(Number);
-      const formattedTotalTime = `${hours}小时${minutes}分钟`;
+      const totalTime = parsedData.data.data[parsedData.data.data.length - 1].running_time
+      const [hours, minutes] = totalTime.split(':').map(Number)
+      const formattedTotalTime = `${hours}小时${minutes}分钟`
       const image = await Render.render('12306/queryTrainInfo', {
         trainInfo: trainData,
         stations: parsedData.data.data,
         totalTime: formattedTotalTime,
         totalDistance: formattedTotalTime
-      }, { e,
-        retType: 'base64'})
-      e.reply(image,true)
+      }, {
+        e,
+        retType: 'base64'
+      })
+      e.reply(image, true)
     } catch (err) {
       logger.error(err)
       e.reply('查询过程中出现了错误，请稍后重试。')
