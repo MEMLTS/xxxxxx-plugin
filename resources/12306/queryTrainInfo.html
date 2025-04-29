@@ -5,7 +5,15 @@
     <!-- 车次和类型 -->
     <h2>{{trainInfo.station_train_code}} {{trainInfo.train_class_name}}</h2>
     <!-- 起始站和终点站 -->
-    <p>{{trainInfo.start_station_name}} <span class="arrow">→</span> {{trainInfo.end_station_name}}</p><p class="train-time">预计全程时间：{{totalTime}}</p>
+    <p>{{trainInfo.start_station_name}} <span class="arrow">→</span>
+      {{trainInfo.end_station_name}}</p><p
+      class="train-time">预计全程时间：{{totalTime}}</p>
+    {{if currentStation}}
+    <p class="current-station">当前位置：{{currentStation}}</p>
+    {{if stopDuration}}
+    <p class="stop-duration">停站时间：{{stopDuration}}分钟</p>
+    {{/if}}
+    {{/if}}
   </div>
 
   <!-- 站点列表 -->
@@ -13,7 +21,8 @@
     <!-- 遍历站点信息 -->
     {{each stations station index}}
     <!-- 单个站点项 -->
-    <div class="station-item {{if station.start_station === '1'}}start-station{{/if}} {{if station.end_station === '1'}}end-station{{/if}}">
+    <div
+      class="station-item {{if station.start_station === '1'}}start-station{{/if}} {{if station.end_station === '1'}}end-station{{/if}} {{if station.station_name === currentStation}}current-station{{/if}}">
       <!-- 左侧站点序号和连接线 -->
       <div class="station-line">
         <div class="station-index">{{station.station_no}}</div>
@@ -26,7 +35,8 @@
         <div class="station-name">{{station.station_name}}</div>
         <div class="station-time">
           <span class="time arrive-time">{{station.arrive_time}}</span>
-          <span class="time-separator">{{if station.arrive_time !== '--' && station.start_time !== '--'}} - {{/if}}</span>
+          <span class="time-separator">{{if station.arrive_time !== '--' &&
+            station.start_time !== '--'}} - {{/if}}</span>
           <span class="time start-time">{{station.start_time}}</span>
         </div>
       </div>
@@ -68,7 +78,6 @@
     right: 0;
     bottom: 0;
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
     z-index: -1;
   }
 
@@ -77,13 +86,24 @@
     max-width: 90%;
     margin: 20px auto;
     padding: 30px;
-    background: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 247, 255, 0.95));
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    transition: transform 0.3s ease;
+    border: 1px solid rgba(26, 115, 232, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .train-info-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #1a73e8, #34a853);
   }
 
   /* 火车头部信息 */
@@ -102,6 +122,26 @@
     font-weight: 700;
     letter-spacing: 0.5px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: inline-block;
+  }
+  
+  .train-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, #1a73e8, #34a853);
+    border-radius: 3px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  
+  .train-header h2:hover::after {
+    transform: scaleX(1);
   }
 
   /* 头部段落 (起止站) */
@@ -110,7 +150,44 @@
     color: #202124; /* 深灰色 */
     font-size: clamp(16px, 4vw, 20px);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    
+    line-height: 1.6;
+    padding: 8px 0;
+  }
+
+  /* 预计全程时间 */
+  .train-time {
+    margin: 8px 0;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #e6f7ff, #bae7ff);
+    border-radius: 8px;
+    color: #1890ff;
+    font-weight: 500;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+  }
+
+  /* 当前位置 */
+  .current-station {
+    margin: 8px 0;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #fffbe6, #ffe58f);
+    border-radius: 8px;
+    color: #faad14;
+    font-weight: 500;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(250, 173, 20, 0.2);
+  }
+
+  /* 停站时间 */
+  .stop-duration {
+    margin: 8px 0;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #fff1f0, #ffccc7);
+    border-radius: 8px;
+    color: #f5222d;
+    font-weight: 500;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(245, 34, 45, 0.2);
   }
 
   /* 箭头样式 */
@@ -123,6 +200,18 @@
   .station-list {
     display: flex;
     flex-direction: column;
+    position: relative;
+  }
+  
+  .station-list::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #1a73e8, #34a853);
+    z-index: 0;
   }
 
   /* 单个站点项 */
@@ -137,6 +226,19 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  /* 当前站点样式 */
+  .station-item.current-station {
+    background-color: #e6f7ff;
+    border: 1px solid #91d5ff;
+    animation: pulse-border 2s infinite;
+  }
+  
+  @keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
   }
 
   /* 鼠标悬停效果 */
@@ -186,14 +288,69 @@
     font-weight: 600;
     z-index: 1;
     box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .station-index:hover {
+    transform: scale(1.1);
+    background-color: #1a73e8;
+    color: white;
+  }
+  
+  .station-index::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid #1a73e8;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+    opacity: 0;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+    70% {
+      transform: scale(1.1);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
   }
 
   /* 连接线 */
   .line {
     width: 2px;
-    background-color: #e8e8e8; /* 浅灰色连接线 */
+    background: linear-gradient(to bottom, #1a73e8, #34a853);
     flex-grow: 1; /* 填充剩余空间 */
     margin-top: 4px; /* 与序号的间距 */
+    position: relative;
+    z-index: 1;
+  }
+  
+  .line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+    animation: shine 2s infinite;
+  }
+  
+  @keyframes shine {
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0; }
   }
 
   /* 中间站点详情 */
@@ -247,8 +404,25 @@
 
   /* 时间分隔符 */
   .time-separator {
-    color: #bfbfbf; /* 浅灰色分隔符 */
+    color: #1a73e8; /* 蓝色分隔符 */
     margin: 0 5px; /* 左右边距 */
+    font-weight: bold;
+    position: relative;
+  }
+  
+  .time-separator::before {
+    content: '⏱️';
+    position: absolute;
+    left: 50%;
+    top: -20px;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .time-separator:hover::before {
+    opacity: 1;
+    top: -15px;
   }
 
   /* 右侧元信息 */
