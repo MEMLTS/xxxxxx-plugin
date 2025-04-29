@@ -41,5 +41,11 @@ export default [
     label: '晋江文学城',
     bottomHelpMessage: '晋江文学城 Cookie',
     component: 'InputPassword'
+  },
+  {
+    field: 'cookie.a12306_cookie',
+    label: '12306',
+    bottomHelpMessage: '12306 Cookie 无任何用处',
+    component: 'InputPassword'
   }
 ]

@@ -5,16 +5,22 @@ import {
   PluginPath
 } from './Path.js'
 
+import Render from './Render.js'
+
 const BotName = Version.isTrss
   ? 'Trss-Yunzai'
   : Version.isMiao
     ? 'Miao-Yunzai'
     : 'Yunzai-Bot'
 
+const PluginName = 'xxxxxx-plugin'
+
 export {
   Version,
   YamlReader,
   Config,
   PluginPath,
-  BotName
+  BotName,
+  PluginName,
+  Render
 }

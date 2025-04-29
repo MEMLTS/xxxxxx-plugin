@@ -1,0 +1,317 @@
+<!-- 火车信息展示容器 -->
+<div class="train-info-container">
+  <!-- 火车头部信息 -->
+  <div class="train-header">
+    <!-- 车次和类型 -->
+    <h2>{{trainInfo.station_train_code}} {{trainInfo.train_class_name}}</h2>
+    <!-- 起始站和终点站 -->
+    <p>{{trainInfo.start_station_name}} <span class="arrow">→</span> {{trainInfo.end_station_name}}</p><p class="train-time">预计全程时间：{{totalTime}}</p>
+  </div>
+
+  <!-- 站点列表 -->
+  <div class="station-list">
+    <!-- 遍历站点信息 -->
+    {{each stations station index}}
+    <!-- 单个站点项 -->
+    <div class="station-item {{if station.start_station === '1'}}start-station{{/if}} {{if station.end_station === '1'}}end-station{{/if}}">
+      <!-- 左侧站点序号和连接线 -->
+      <div class="station-line">
+        <div class="station-index">{{station.station_no}}</div>
+        {{if index < stations.length - 1}}
+        <div class="line"></div>
+        {{/if}}
+      </div>
+      <!-- 中间站点名称和时间 -->
+      <div class="station-details">
+        <div class="station-name">{{station.station_name}}</div>
+        <div class="station-time">
+          <span class="time arrive-time">{{station.arrive_time}}</span>
+          <span class="time-separator">{{if station.arrive_time !== '--' && station.start_time !== '--'}} - {{/if}}</span>
+          <span class="time start-time">{{station.start_time}}</span>
+        </div>
+      </div>
+      <!-- 右侧运行时间和到达日期 -->
+      <div class="station-meta">
+        <span class="running-time">{{station.running_time}}</span>
+        {{if station.arrive_day_str !== '当日到达'}}
+        <span class="arrive-day">{{station.arrive_day_str}}</span>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
+<style>
+@font-face {
+  font-family: 'FangYuan';
+  src: url('../plugins/xxxxxx-plugin/resources/fonts/AlimamaFangYuanTiVF-Thin.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+  /* 基础样式重置和字体设置 */
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    background: url('http://api.hlz7.com/mm') center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding: 20px 0;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: -1;
+  }
+
+  /* 火车信息容器 */
+  .train-info-container {
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease;
+  }
+
+  /* 火车头部信息 */
+  .train-header {
+    text-align: center;
+    margin-bottom: 30px; /* 增加底部间距 */
+    padding-bottom: 20px; /* 增加底部内边距 */
+    border-bottom: 1px solid #e8e8e8; /* 浅灰色分隔线 */
+  }
+
+  /* 头部标题 (车次和类型) */
+  .train-header h2 {
+    margin: 0 0 15px;
+    color: #1a73e8;
+    font-size: clamp(24px, 5vw, 32px);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 头部段落 (起止站) */
+  .train-header p {
+    margin: 0;
+    color: #202124; /* 深灰色 */
+    font-size: clamp(16px, 4vw, 20px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    
+  }
+
+  /* 箭头样式 */
+  .arrow {
+    color: #8c8c8c; /* 灰色箭头 */
+    margin: 0 8px; /* 左右边距 */
+  }
+
+  /* 站点列表容器 */
+  .station-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 单个站点项 */
+  .station-item {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 15px;
+    position: relative;
+    background-color: #fff;
+    padding: 20px 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  /* 鼠标悬停效果 */
+  .station-item:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+  }
+
+  /* 站点项之间的连接线 (通过伪元素实现) */
+  /* .station-item::before {
+    content: '';
+    position: absolute;
+    left: 30px; 
+    top: -10px; 
+    width: 2px;
+    height: 10px;
+    background: #d9d9d9; 
+  }
+
+  .station-item:first-child::before {
+    display: none; 
+  } */
+
+  /* 左侧站点序号和连接线 */
+  .station-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60px; /* 固定宽度 */
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  /* 站点序号 */
+  .station-index {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    border: 2px solid #1a73e8;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+  }
+
+  /* 连接线 */
+  .line {
+    width: 2px;
+    background-color: #e8e8e8; /* 浅灰色连接线 */
+    flex-grow: 1; /* 填充剩余空间 */
+    margin-top: 4px; /* 与序号的间距 */
+  }
+
+  /* 中间站点详情 */
+  .station-details {
+    flex-grow: 1; /* 占据主要空间 */
+    padding: 0 15px; /* 左右内边距 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中 */
+  }
+
+  /* 站点名称 */
+  .station-name {
+    font-weight: 600;
+    color: #202124;
+    font-size: 18px;
+    margin-bottom: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* 站点时间容器 */
+  .station-time {
+    display: flex;
+    align-items: center;
+    color: #202124; /* 深灰色 */
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  /* 时间文本 */
+  .time {
+    min-width: 45px; /* 增加最小宽度 */
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* 到达时间 */
+  .arrive-time {
+    color: #fff;
+    background-color: rgba(82, 196, 26, 0.8);
+  }
+
+  /* 出发时间 */
+  .start-time {
+    color: #fff;
+    background-color: rgba(250, 140, 22, 0.8);
+  }
+
+  /* 时间分隔符 */
+  .time-separator {
+    color: #bfbfbf; /* 浅灰色分隔符 */
+    margin: 0 5px; /* 左右边距 */
+  }
+
+  /* 右侧元信息 */
+  .station-meta {
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    align-items: flex-end; /* 右对齐 */
+    justify-content: center; /* 垂直居中 */
+    padding-right: 20px; /* 右侧内边距 */
+    flex-shrink: 0; /* 防止被压缩 */
+    min-width: 80px; /* 最小宽度 */
+  }
+
+  /* 运行时间 */
+  .running-time {
+    color: #8c8c8c; /* 灰色文字 */
+    font-size: 13px; /* 稍小字号 */
+    margin-bottom: 4px; /* 与到达日期的间距 */
+  }
+
+  /* 到达日期标识 */
+  .arrive-day {
+    color: #f5222d; /* 红色突出显示 */
+    font-size: 12px;
+    padding: 3px 8px; /* 内边距 */
+    background: #fff1f0; /* 淡红色背景 */
+    border: 1px solid #ffa39e; /* 浅红色边框 */
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* 起始站特殊样式 */
+  .start-station .station-index {
+    background-color: #f6ffed; /* 淡绿色背景 */
+    border-color: #b7eb8f; /* 浅绿色边框 */
+    color: #52c41a; /* 绿色文字 */
+  }
+  .start-station .station-name {
+      font-weight: 600; /* 加粗 */
+  }
+
+  /* 终点站特殊样式 */
+  .end-station .station-index {
+    background-color: #fffbe6; /* 淡黄色背景 */
+    border-color: #ffe58f; /* 浅黄色边框 */
+    color: #faad14; /* 黄色文字 */
+  }
+   .end-station .station-name {
+      font-weight: 600; /* 加粗 */
+  }
+  /* 终点站没有连接线 */
+  .end-station .line {
+      display: none;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+</style>
