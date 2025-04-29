@@ -8,3 +8,6 @@ proxyUrl:
 # 通用反代
 common: false
 commonUrl:
+
+# 12306列车查询样式
+a12306_QueryTrainType: 1

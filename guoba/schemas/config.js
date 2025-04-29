@@ -44,5 +44,20 @@ export default [
     componentProps: {
       placeholder: '请输入通用反代地址'
     }
+  },
+  {
+    component: 'Divider',
+    label: '12306'
+  },
+  {
+    field: 'config.a12306_QueryTrainType',
+    label: '查询列车图片模板',
+    component: 'Select',
+    componentProps: {
+      options: [
+        { label: '怪怪的风格', value: 1 },
+        { label: '简介明了', value: 2 }
+      ]
+    }
   }
 ]

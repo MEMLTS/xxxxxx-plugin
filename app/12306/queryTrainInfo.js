@@ -84,7 +84,7 @@ export class QueryTrainInfo extends plugin {
         }
       }
       let template
-      switch (global.xxxxxx.a12306.QueryTrainType) {
+      switch (global.xxxxxx.config.a12306_QueryTrainType) {
         case 1:
           template = '12306/queryTrainInfo'
           break
