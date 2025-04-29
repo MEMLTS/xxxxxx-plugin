@@ -2,6 +2,7 @@ import lodash from 'lodash'
 import config from './config.js'
 import cookie from './cookie.js'
 import x from './x.js'
+import pixiv from './pixiv.js'
 import { Config } from '#components'
 
 export const schemas = [config, cookie, x].flat()
@@ -10,7 +11,8 @@ export function getConfigData () {
   return {
     config: Config.getDefOrConfig('config'),
     cookie: Config.getDefOrConfig('cookie'),
-    x: Config.getDefOrConfig('x')
+    x: Config.getDefOrConfig('x'),
+    pixiv: Config.getDefOrConfig('pixiv')
   }
 }
 
@@ -18,7 +20,8 @@ export async function setConfigData (data, { Result }) {
   const configFiles = {
     config: Config.getDefOrConfig('config'),
     cookie: Config.getDefOrConfig('cookie'),
-    x: Config.getDefOrConfig('x')
+    x: Config.getDefOrConfig('x'),
+    pixiv: Config.getDefOrConfig('pixiv')
   }
 
   for (const [key, value] of Object.entries(data)) {

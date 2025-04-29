@@ -1,3 +1,4 @@
+import { getReq } from './request.js'
 import { Request } from '#utils'
 
 export class PixivNovel extends plugin {
@@ -9,7 +10,7 @@ export class PixivNovel extends plugin {
       priority: 1,
       rule: [
         {
-          reg: /^(?:https?:\/\/)?www\.pixiv\.net\/novel\/show\.php\?id=(\d+)|^#pixiv(?:查看|阅读)(小说)(\d+)/,
+          reg: /^(?:https?:\/\/)?www\.pixiv\.net\/novel\/show\.php\?id=(\d+)|^#pixiv(?:查看|阅读)(小说)(\d+)/i,
           fnc: 'novel'
         }
       ]
@@ -17,10 +18,13 @@ export class PixivNovel extends plugin {
   }
 
   async novel (e) {
-    e.reply('Pixiv正在解析中...', true)
+    if (!global.xxxxxx.pixiv.enable) {
+      return logger.warn('[xxxxxx] Pixiv解析未启用！')
+    }
+    e.reply('Pixiv正在解析中...', true, { recallMsg: 5 })
     let id
     const urlMatch = e.msg.match(
-      /(?:https?:\/\/)?www\.pixiv\.net\/novel\/show\.php\?id=(\d+)/
+      /(?:https?:\/\/)?www\.pixiv\.net\/novel\/show\.php\?id=(\d+)/i
     )
     if (urlMatch) {
       id = urlMatch[1]
@@ -31,10 +35,7 @@ export class PixivNovel extends plugin {
       id = pixivMatch[2]
     }
     let url = `https://www.pixiv.net/ajax/novel/${id}?lang=zh`
-    const response = await Request.request({
-      url,
-      cookie: undefined
-    })
+    const response = await getReq(url)
 
     const novelData = JSON.parse(response.data).body
     const novelDetail = novelData.content.replace(/<br\s*\/?>/g, '\n').replace(/<[^>]+>/g, '')

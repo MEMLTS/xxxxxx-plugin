@@ -4,6 +4,10 @@ export default [
     component: 'SOFT_GROUP_BEGIN'
   },
   {
+    component: 'Divider',
+    label: '基础配置'
+  },
+  {
     field: 'config.renderScale',
     label: '渲染精度',
     component: 'InputNumber',

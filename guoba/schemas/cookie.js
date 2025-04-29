@@ -19,9 +19,9 @@ export default [
     component: 'InputPassword'
   },
   {
-    field: 'cookie.pixiv_refresh_token',
+    field: 'cookie.pixiv_PHPSESSID',
     label: 'Pixiv',
-    bottomHelpMessage: 'Pixiv refresh token',
+    bottomHelpMessage: 'Pixiv PHPSESSID',
     component: 'InputPassword'
   },
   {

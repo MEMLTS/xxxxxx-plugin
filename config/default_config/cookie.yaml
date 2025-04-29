@@ -5,7 +5,10 @@ x_auth_token:
 x_ct0:
 
 # Pixiv refresh token
-pixiv_refresh_token:
+pixiv_PHPSESSID:
+
+# Pixiv Cookie
+pixiv_cookie:
 
 # JM Cookie
 jm_cookie:
