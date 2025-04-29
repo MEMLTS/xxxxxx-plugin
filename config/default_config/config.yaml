@@ -1,3 +1,6 @@
+# 页面渲染精度
+renderScale: 100
+
 # Proxy settings
 proxy: false
 proxyUrl:

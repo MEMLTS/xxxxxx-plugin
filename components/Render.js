@@ -1,13 +1,7 @@
 import { Version, PluginName, PluginPath, BotName } from '../components/index.js'
 
-const memz = {
-  memz: {
-    renderScale: 100 // 默认缩放比例为100%
-  }
-}
-
 function scale (pct = 1, customScale = 1) {
-  const baseScale = Math.min(2, Math.max(0.5, memz.memz.renderScale / 100))
+  const baseScale = Math.min(2, Math.max(0.5, global.xxxxxx.config.renderScale / 100))
   pct = pct * baseScale * customScale
   return `style=transform:scale(${pct})`
 }

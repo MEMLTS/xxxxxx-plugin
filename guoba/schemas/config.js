@@ -4,6 +4,15 @@ export default [
     component: 'SOFT_GROUP_BEGIN'
   },
   {
+    field: 'config.renderScale',
+    label: '渲染精度',
+    component: 'InputNumber',
+    bottomHelpMessage: '数值越大，渲染精度越高，但是渲染时间也会越长',
+    componentProps: {
+      placeholder: '请输入渲染精度'
+    }
+  },
+  {
     component: 'Divider',
     label: '代理'
   },
