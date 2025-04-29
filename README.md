@@ -40,7 +40,7 @@ _✨ 一个强大的多平台解析插件，为Yunzai-Bot提供丰富的内容�
 
 1. 在Yunzai根目录下执行
 ```bash
-git clone https://github.com/your-username/xxxxxx-plugin.git ./plugins/xxxxxx-plugin/
+git clone https://github.com/MEMLTS/xxxxxx-plugin.git ./plugins/xxxxxx-plugin/
 ```
 
 2. 安装插件依赖
