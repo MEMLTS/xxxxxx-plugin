@@ -8,7 +8,7 @@ import {
 import Render from './Render.js'
 
 const BotName = Version.isTrss
-  ? 'Trss-Yunzai'
+  ? 'TRSS-Yunzai'
   : Version.isMiao
     ? 'Miao-Yunzai'
     : 'Yunzai-Bot'

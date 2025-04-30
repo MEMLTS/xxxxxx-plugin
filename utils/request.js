@@ -63,7 +63,7 @@ class Request {
     cookie,
     method = 'GET',
     timeout = 10000,
-    proxy = config.proxyUrl,
+    proxy = global.xxxxxx.config.proxyUrl,
     ...rest
   }) {
     const parsedUrl = new URL(url)
@@ -88,7 +88,7 @@ class Request {
     }
 
     // 创建代理
-    const agent = this.createAgent(global.xxxxxx.config.proxy) || (protocol === 'https:' ? new https.Agent() : new http.Agent())
+    const agent = this.createAgent(proxy) || (protocol === 'https:' ? new https.Agent() : new http.Agent())
 
     // 请求配置
     const options = {

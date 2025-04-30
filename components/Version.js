@@ -1,6 +1,8 @@
 import fs from 'fs'
 import { PluginPath } from './Path.js'
 import path from 'path'
+import { exec } from 'child_process'
+import { promisify } from 'util'
 
 const readJsonFile = (filePath) => {
   try {
@@ -10,6 +12,14 @@ const readJsonFile = (filePath) => {
   }
 }
 
+const execAsync = promisify(exec)
+
+export async function getCurrentCommitHash () {
+  const { stdout } = await execAsync('git rev-parse HEAD')
+  return stdout.trim()
+}
+
+const hash = await getCurrentCommitHash()
 const packageJson = readJsonFile('package.json')
 const pluginPackageJson = readJsonFile(path.join(PluginPath, 'package.json'))
 
@@ -22,6 +32,9 @@ const Version = {
   },
   get yunzai () {
     return packageJson?.version || null
+  },
+  get gitHash () {
+    return hash
   }
 }
 

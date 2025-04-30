@@ -28,7 +28,7 @@ const Render = {
           sys: {
             scale: scale(1, customScale)
           },
-          copyright: `<div class="copyright"><div class="copyright-info">Created By ${BotName} <span class="version">${Version.yunzai}</span> & ${PluginName}<span class="version"> ${data.pluginVersion || Version.latestVersion}</span></div></div>`
+          copyright: `<div class="copyright"><div class="copyright-info">Created By ${BotName} <span class="version">${Version.yunzai}</span> & ${PluginName}<span class="version"> ${Version.latestVersion}</span> & Git Hash <span class="version"> ${Version.gitHash}</span></div></div>`
         }
       }
     })
