@@ -44,6 +44,8 @@ export class EHentaiSearch extends plugin {
     const keyword = e.msg.replace(/^(e)(hentai|站)(search|搜索)/i, '').trim()
     if (!keyword) return e.reply('请输入关键词', true)
 
+    e.reply('EHentai正在搜索...', true, { recallMsg: 5 })
+
     let url = `https://e-hentai.org/?f_search=${encodeURIComponent(keyword)}`
     const response = await Request.request({ url })
     let html = response.data
