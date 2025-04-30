@@ -2,6 +2,7 @@ import lodash from 'lodash'
 import config from './config.js'
 import cookie from './cookie.js'
 import x from './x.js'
+import ehentai from './ehentai.js'
 import pixiv from './pixiv.js'
 import { Config } from '#components'
 
@@ -9,7 +10,8 @@ export const schemas = [
   config,
   cookie,
   x,
-  pixiv
+  pixiv,
+  ehentai
 ].flat()
 
 export function getConfigData () {
@@ -17,7 +19,8 @@ export function getConfigData () {
     config: Config.getDefOrConfig('config'),
     cookie: Config.getDefOrConfig('cookie'),
     x: Config.getDefOrConfig('x'),
-    pixiv: Config.getDefOrConfig('pixiv')
+    pixiv: Config.getDefOrConfig('pixiv'),
+    ehentai: Config.getDefOrConfig('ehentai')
   }
 }
 
@@ -26,7 +29,8 @@ export async function setConfigData (data, { Result }) {
     ['config', Config.getDefOrConfig('config')],
     ['cookie', Config.getDefOrConfig('cookie')],
     ['x', Config.getDefOrConfig('x')],
-    ['pixiv', Config.getDefOrConfig('pixiv')]
+    ['pixiv', Config.getDefOrConfig('pixiv')],
+    ['ehentai', Config.getDefOrConfig('ehentai')]
   ])
 
   for (const [key, value] of Object.entries(data)) {

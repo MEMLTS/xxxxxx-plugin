@@ -38,6 +38,9 @@ export class EHentaiSearch extends plugin {
   }
 
   async search (e) {
+    if (!global.xxxxxx.ehentai.enable) {
+      return logger.warn('[xxxxxx] Ehentai未启用！')
+    }
     const keyword = e.msg.replace(/^(e)(hentai|站)(search|搜索)/i, '').trim()
     if (!keyword) return e.reply('请输入关键词', true)
 
