@@ -1,4 +1,4 @@
-import { Version, PluginName, PluginPath, BotName } from './index.js'
+import { Version, PluginName, BotName } from './index.js'
 
 function scale (pct = 1, customScale = 1) {
   const baseScale = Math.min(2, Math.max(0.5, global.xxxxxx.config.renderScale / 100))

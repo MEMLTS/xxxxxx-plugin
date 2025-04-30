@@ -1,6 +1,4 @@
-import fs from 'fs/promises'
-import path from 'path'
-import { PluginPath, Render } from '#components'
+import { Render } from '#components'
 import { Request } from '#utils'
 import { formatCurrentDate } from './utils.js'
 
@@ -31,13 +29,24 @@ export class QueryTrainInfo extends plugin {
 
     e.reply('正在查询，请稍等...', true, { recallMsg: 7 })
 
-    const filePath = path.join(PluginPath, 'config', 'trainInfo.json')
     let trainData
 
     try {
-      const data = await fs.readFile(filePath, 'utf8')
-      const trainInfo = JSON.parse(data)
-      trainData = trainInfo.find(
+      const searchUrl = `https://search.12306.cn/search/v1/train/search?keyword=${trainNumber}&date=${await formatCurrentDate()}`
+      const searchResponse = await Request.request({
+        url: searchUrl,
+        cookie: global.xxxxxx.cookie.a12306_cookie,
+        headers: {
+          Referer: 'https://www.12306.cn/index/'
+        }
+      })
+      const searchData = JSON.parse(searchResponse.data)
+      logger.debug(searchData)
+      if (!searchData.status || !Array.isArray(searchData.data)) {
+        return e.reply('查询车次信息失败，请稍后重试。', true)
+      }
+
+      trainData = searchData.data.find(
         (train) => train.station_train_code.toLowerCase() === trainNumber.toLowerCase()
       )
 

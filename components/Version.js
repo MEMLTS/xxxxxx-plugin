@@ -15,7 +15,8 @@ const pluginPackageJson = readJsonFile(path.join(PluginPath, 'package.json'))
 
 const Version = {
   isMiao: Boolean(packageJson?.dependencies?.sequelize),
-  isTrss: typeof Bot !== 'undefined' && Array.isArray(Bot.uin),
+  isTrss: Array.isArray(Bot.uin),
+  isXRK: Boolean(packageJson?.name == 'xrk-yunzai'),
   get latestVersion () {
     return pluginPackageJson?.version || null
   },

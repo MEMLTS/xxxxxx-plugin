@@ -129,7 +129,7 @@ export class EHentaiSearch extends plugin {
       if (src) {
         try {
           const imgData = await Request.request({ url: src })
-          msg.push(segment.image(`base64://${Buffer.from(imgData.data).toString('base64')}`))
+          msg.push(segment.image(`base64://${Buffer.from(imgData.data).toString('base64')}`, `${i + 1}.webp`))
         } catch {
           msg.push(`❌ 图片加载失败: ${src}`)
         }
