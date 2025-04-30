@@ -77,6 +77,3 @@ export async function translateQQText (
     return null
   }
 }
-
-// 翻译示例
-// console.log(await translateQQText('Hello World!'))

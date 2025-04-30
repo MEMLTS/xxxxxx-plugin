@@ -33,6 +33,7 @@
                 </div>
                 {{/each}}
             </div>
+            {{@copyright}}
         </div>
     </body>
     <style>
@@ -151,6 +152,28 @@ body {
     .header h1 {
         font-size: 28px;
     }
-}
+} 
+ /* 版权信息样式 */
+  .copyright {
+    text-align: center;
+    margin: 20px 0;
+    padding: 10px;
+    font-size: 12px;
+    color: #666;
+    opacity: 0.8;
+  }
+
+  .copyright-info {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .copyright .version {
+    color: #1a73e8;
+    font-weight: 500;
+  }
 </style>
 </html>

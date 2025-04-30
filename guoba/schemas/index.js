@@ -5,7 +5,12 @@ import x from './x.js'
 import pixiv from './pixiv.js'
 import { Config } from '#components'
 
-export const schemas = [config, cookie, x].flat()
+export const schemas = [
+  config,
+  cookie,
+  x,
+  pixiv
+].flat()
 
 export function getConfigData () {
   return {
@@ -17,21 +22,22 @@ export function getConfigData () {
 }
 
 export async function setConfigData (data, { Result }) {
-  const configFiles = {
-    config: Config.getDefOrConfig('config'),
-    cookie: Config.getDefOrConfig('cookie'),
-    x: Config.getDefOrConfig('x'),
-    pixiv: Config.getDefOrConfig('pixiv')
-  }
+  const configFiles = new Map([
+    ['config', Config.getDefOrConfig('config')],
+    ['cookie', Config.getDefOrConfig('cookie')],
+    ['x', Config.getDefOrConfig('x')],
+    ['pixiv', Config.getDefOrConfig('pixiv')]
+  ])
 
   for (const [key, value] of Object.entries(data)) {
-    const [rootKey, ...split] = key.split('.')
-    const configFile = configFiles[rootKey]
+    const split = key.split('.')
+    const rootKey = split[0]
+    const configFile = configFiles.get(rootKey)
 
     if (!configFile) continue
 
     let currentConfig = configFile
-    for (let i = 0; i < split.length - 1; i++) {
+    for (let i = 1; i < split.length - 1; i++) {
       if (currentConfig[split[i]] === undefined) {
         currentConfig[split[i]] = {}
       }

@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
-//* 评论
-//! https://www.pixiv.net/ajax/illusts/comments/roots?illust_id=129414885&offset=0&limit=3&lang=zh
+//* 评论,懒得写了
+//! https://www.pixiv.net/ajax/illusts/comments/roots?illust_id=${id}&offset=0&limit=3&lang=zh
 
 import { Request } from '#utils'
 import { Config } from '#components'

@@ -14,7 +14,6 @@ const Render = {
       renderCfg: cfg.renderCfg || {},
       beforeRender ({ data }) {
         const resPath = data.pluResPath
-        const layoutPath = `${PluginPath}/resources/common/layout/`
         const saveId =
           (cfg.saveId || e?.user_id || data.saveId) +
           '_' +
@@ -26,19 +25,10 @@ const Render = {
           ...data,
           saveId,
           _res_path: resPath,
-          defaultLayout: layoutPath + 'default.html',
-          elemLayout: layoutPath + 'elem.html',
           sys: {
             scale: scale(1, customScale)
           },
-          copyright: `Created By ${BotName}<span class="version">${Version.yunzai}</span> & ${PluginName}<span class="version">${data.pluginVersion || Version.latestVersion}</span>`,
-          pageGotoParams: {
-            waitUntil: 'networkidle2',
-            viewport: cfg.renderCfg?.viewPort || {
-              width: 1200,
-              height: 'auto'
-            }
-          }
+          copyright: `<div class="copyright"><div class="copyright-info">Created By ${BotName} <span class="version">${Version.yunzai}</span> & ${PluginName}<span class="version"> ${data.pluginVersion || Version.latestVersion}</span></div></div>`
         }
       }
     })
