@@ -2,7 +2,8 @@ import Version from './Version.js'
 import YamlReader from './YamlReader.js'
 import Config from './Config.js'
 import {
-  PluginPath
+  PluginPath,
+  PluginName
 } from './Path.js'
 
 import Render from './Render.js'
@@ -12,8 +13,6 @@ const BotName = Version.isTrss
   : Version.isMiao
     ? 'Miao-Yunzai'
     : 'Yunzai-Bot'
-
-const PluginName = 'xxxxxx-plugin'
 
 export {
   Version,
