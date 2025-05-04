@@ -20,7 +20,6 @@ export class SearchTrainInfo extends plugin {
   async searchTrainInfo (e) {
     let trainNumber = e.msg.replace(/#?(12306)?(搜索|search|搜)(火车|车次|列车)(编号|号)?/i, '')
     let url = `https://search.12306.cn/search/v1/train/search?keyword=${trainNumber}&date=${await formatCurrentDate()}`
-    logger.info(url)
     const response = await Request.request({
       url
     })

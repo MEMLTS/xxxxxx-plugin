@@ -4,6 +4,7 @@ import http from 'http'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 import { SocksProxyAgent } from 'socks-proxy-agent'
 import { Config } from '#components'
+import { addTrailingSlash } from './tools.js'
 
 const config = Config.getDefOrConfig('config')
 
@@ -64,8 +65,15 @@ class Request {
     method = 'GET',
     timeout = 10000,
     proxy = global.xxxxxx.config.proxyUrl,
+    commonProxy = global.xxxxxx.config.commonUrl,
     ...rest
   }) {
+    // 处理通用反代
+    if (global.xxxxxx.config.common && global.xxxxxx.config.commonUrl) {
+      commonProxy = addTrailingSlash(commonProxy)
+      url = commonProxy + url
+    }
+
     const parsedUrl = new URL(url)
     const { protocol, hostname, port, pathname, search } = parsedUrl
     const path = pathname + search

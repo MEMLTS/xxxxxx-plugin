@@ -28,7 +28,6 @@ export class QueryTrainInfo extends plugin {
     }
 
     e.reply('正在查询，请稍等...', true, { recallMsg: 7 })
-
     let trainData
 
     try {
